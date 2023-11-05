@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torch_geometric.loader import NeighborLoader, DataLoader
 
 from training_tools import Logger, set_seed
-from graph_tools import to_inductive, kmeans_divide, SC_divide, metis_divide, get_subgraph, GPPool, GPPool2
+from graph_tools import to_inductive, kmeans_divide, SC_divide, metis_divide, get_subgraph, GPPool
 from model import GCN, Net_APPNP, SAGE
 
 
@@ -16,7 +16,6 @@ def get_train_loader(divide_list, data, gppool, y_setting, batch_size):
     if gppool:
         for unpooled_parts in loader:
             pooled_g = GPPool(data, divide_list, unpooled_parts, y_setting)
-            # pooled_g = GPPool2(data, divide_list, unpooled_parts, y_setting)
             train_loader.append(pooled_g)
     else:
         for part in divide_list:
