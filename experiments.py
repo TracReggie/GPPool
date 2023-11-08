@@ -112,27 +112,9 @@ def GCN_experiments(args, data, device):
 
         weight_decay = args.weight_decay if args.weight_decay is not None else 0
         optimizer1 = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=weight_decay)
-        optimizer2 = torch.optim.SGD(model.parameters(), lr=0.001)
-
-        best_val_acc = 0.
-        best_test_acc = 0.
+        
         for epoch in range(1, 1 + args.epochs):
             loss = train(model, train_loader, optimizer1, device)
-            print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
-            train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
-
-            if epoch > 9 and epoch % args.eval_steps == 0:
-                train_acc, val_acc, test_acc = GCN_test(model, data)
-                print(f'Train: {train_acc:.4f}, Val: {val_acc:.4f}, Test: {test_acc:.4f}')
-
-                if val_acc > best_val_acc and test_acc > best_test_acc:
-                    best_val_acc = val_acc
-                    best_test_acc = test_acc
-                    torch.save(model, f'./{args.save_name}.pt')
-
-        model = torch.load(f'./{args.save_name}.pt').to(device)
-        for epoch in range(1 + args.epochs, 21 + args.epochs):
-            loss = train(model, train_loader, optimizer2, device)
             print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
             train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
 
@@ -176,27 +158,9 @@ def APPNP_experiments(args, data, device):
 
         weight_decay = args.weight_decay if args.weight_decay is not None else 0
         optimizer1 = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=weight_decay)
-        optimizer2 = torch.optim.SGD(model.parameters(), lr=0.001)
-
-        best_val_acc = 0.
-        best_test_acc = 0.
+        
         for epoch in range(1, 1 + args.epochs):
             loss = train(model, train_loader, optimizer1, device)
-            print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
-            train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
-
-            if epoch > 9 and epoch % args.eval_steps == 0:
-                train_acc, val_acc, test_acc = GCN_test(model, data)
-                print(f'Train: {train_acc:.4f}, Val: {val_acc:.4f}, Test: {test_acc:.4f}')
-
-                if val_acc > best_val_acc and test_acc > best_test_acc:
-                    best_val_acc = val_acc
-                    best_test_acc = test_acc
-                    torch.save(model, f'./{args.save_name}.pt')
-
-        model = torch.load(f'./{args.save_name}.pt').to(device)
-        for epoch in range(1 + args.epochs, 21 + args.epochs):
-            loss = train(model, train_loader, optimizer2, device)
             print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
             train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
 
@@ -243,10 +207,7 @@ def SAGE_experiments(args, data, device):
 
         weight_decay = args.weight_decay if args.weight_decay is not None else 0
         optimizer1 = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=weight_decay)
-        optimizer2 = torch.optim.SGD(model.parameters(), lr=0.001)
 
-        best_val_acc = 0.
-        best_test_acc = 0.
         for epoch in range(1, 1 + args.epochs):
             loss = train(model, train_loader, optimizer1, device)
             print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
@@ -255,23 +216,8 @@ def SAGE_experiments(args, data, device):
             if epoch > 9 and epoch % args.eval_steps == 0:
                 train_acc, val_acc, test_acc = SAGE_test(model, data, test_loader, device)
                 print(f'Train: {train_acc:.4f}, Val: {val_acc:.4f}, Test: {test_acc:.4f}')
-
-                if val_acc > best_val_acc and test_acc > best_test_acc:
-                    best_val_acc = val_acc
-                    best_test_acc = test_acc
-                    torch.save(model, f'./{args.save_name}.pt')
-
-        model = torch.load(f'./{args.save_name}.pt').to(device)
-        for epoch in range(1 + args.epochs, 21 + args.epochs):
-            loss = train(model, train_loader, optimizer2, device)
-            print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
-            train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
-
-            if epoch > 9 and epoch % args.eval_steps == 0:
-                train_acc, val_acc, test_acc = SAGE_test(model, data, test_loader, device)
                 result = train_acc, val_acc, test_acc
                 logger.add_result(run, result)
-                print(f'Train: {train_acc:.4f}, Val: {val_acc:.4f}, Test: {test_acc:.4f}')
 
         logger.print_statistics(run)
     logger.print_statistics()
