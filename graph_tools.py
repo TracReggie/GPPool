@@ -8,21 +8,7 @@ from sklearn.cluster import KMeans, SpectralClustering
 
 import torch_geometric.typing as pyg_typing
 from torch_geometric.utils.sparse import index2ptr
-from torch_geometric.utils.map import map_index
 
-
-
-def to_inductive(data):
-    inductive_data = data.clone()
-    inductive_data.x = data.x[data.train_mask]
-    inductive_data.y = data.y[data.train_mask]
-    inductive_data.edge_index, _ = subgraph(data.train_mask, data.edge_index, None, True, data.x.size(0))
-    inductive_data.num_nodes = data.train_mask.sum().item()
-    inductive_data.train_mask = data.train_mask[data.train_mask]
-    inductive_data.val_mask = torch.tensor([0 for _ in range(inductive_data.num_nodes)], dtype=torch.bool)
-    inductive_data.test_mask = torch.tensor([0 for _ in range(inductive_data.num_nodes)], dtype=torch.bool)
-
-    return inductive_data
 
 
 def GCN_adj(edge_index, self_loops=True):
@@ -117,7 +103,7 @@ def GPPool(data, divide_list, unpooled_parts, y_setting):
         if i in unpooled_parts:
             unpooled_nodes.extend(part)
         else:
-            pooled_parts.append(part)
+            pooled_parts.append(part) if len(part) > 0 else None
 
     cluster = torch.zeros(data.x.size(0), dtype=torch.long)
     cluster[unpooled_nodes] = torch.tensor(range(len(unpooled_nodes)), dtype=torch.long)
