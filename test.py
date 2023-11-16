@@ -21,9 +21,7 @@ def main():
     args = parser.parse_args()
     print(args)
 
-    run_experiments(
-        args.dataset, args.backbone, args.divide_method, args.num_subgraphs, args.y_setting,
-        args.gppool, args.lr, args.weight_decay, args.epochs, args.eval_steps, args.runs, args.cuda)
+    run_experiments(args.dataset, args.backbone, args.divide_method, args.num_subgraphs, args.y_setting, args.gppool, args.lr, args.weight_decay, args.epochs, args.eval_steps, args.runs, args.cuda)
 
     print('============================================')
     print(args)
