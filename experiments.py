@@ -68,10 +68,7 @@ def test(model, data, backbone, test_loader, device):
 
 
 
-def run_experiments(
-        dataset, backbone, divide_method, num_subgraphs, y_setting,
-        gppool, lr, weight_decay, epochs, eval_steps, runs, cuda):
-
+def run_experiments(dataset, backbone, divide_method, num_subgraphs, y_setting, gppool, lr, weight_decay, epochs, eval_steps, runs, cuda):
     set_seed()
     data = return_dataset(f'{dataset}')
     device = torch.device(f'cuda:{cuda}')
@@ -94,14 +91,12 @@ def run_experiments(
         model = SAGE(data.num_features, 512, data.num_classes, 3, 0.2).to(device)
 
     train_loader = get_train_loader(divide_list, data, gppool, y_setting, int(num_subgraphs / 4))
-    test_loader = NeighborLoader(data, num_neighbors=[-1], shuffle=False, batch_size=15000,
-                                 num_workers=16, persistent_workers=True)
+    test_loader = NeighborLoader(data, num_neighbors=[-1], shuffle=False, batch_size=15000, num_workers=16, persistent_workers=True)
 
     logger = Logger(runs)
     for run in range(runs):
         print('============================================')
         model.reset_parameters()
-
         optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
         for epoch in range(1, 1 + epochs):
