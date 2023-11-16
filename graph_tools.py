@@ -91,8 +91,7 @@ def get_subgraph(data, nodes_index, relabel_nodes):
     sub_test_mask = data.test_mask[nodes_index]
     sub_edge_index, _ = subgraph(nodes_index, data.edge_index, None, relabel_nodes, data.x.size(0))
 
-    induced_subgraph = Data(x=sub_x, y=sub_y, edge_index=sub_edge_index,
-                            train_mask=sub_train_mask, val_mask=sub_val_mask, test_mask=sub_test_mask)
+    induced_subgraph = Data(x=sub_x, y=sub_y, edge_index=sub_edge_index, train_mask=sub_train_mask, val_mask=sub_val_mask, test_mask=sub_test_mask)
 
     return induced_subgraph
 
