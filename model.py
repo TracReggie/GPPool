@@ -37,8 +37,7 @@ class GCN(torch.nn.Module):
         x, edge_index = x.cpu(), edge_index.cpu()
         adj_sym = GCN_adj(edge_index)
 
-        weights = [(conv.lin.weight.t().cpu().detach().numpy(), conv.bias.cpu().detach().numpy())
-                   for conv in self.convs]
+        weights = [(conv.lin.weight.t().cpu().detach().numpy(), conv.bias.cpu().detach().numpy()) for conv in self.convs]
 
         for i, (weight_W, weight_B) in enumerate(weights):
             x = adj_sym @ x @ weight_W + weight_B  # AXW + B
@@ -81,8 +80,7 @@ class Net_APPNP(torch.nn.Module):
     def inference(self, x, edge_index):
         adj_sym = GCN_adj(edge_index)
 
-        weights = [(linear.weight.t().cpu().detach().numpy(), linear.bias.cpu().detach().numpy())
-                   for linear in self.linears]
+        weights = [(linear.weight.t().cpu().detach().numpy(), linear.bias.cpu().detach().numpy()) for linear in self.linears]
 
         for i, (weight_W, weight_B) in enumerate(weights):
             x = x @ weight_W + weight_B
