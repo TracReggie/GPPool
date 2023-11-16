@@ -68,53 +68,52 @@ def test(model, data, backbone, test_loader, device):
 
 
 
-def run_experiments(args):
+def run_experiments(
+        dataset, backbone, divide_method, num_subgraphs, y_setting,
+        gppool, lr, weight_decay, epochs, eval_steps, runs, cuda):
+
     set_seed()
-    data = return_dataset(f'{args.dataset}')
-    device = torch.device(f'cuda:{args.cuda}')
+    data = return_dataset(f'{dataset}')
+    device = torch.device(f'cuda:{cuda}')
 
-    if args.divide_method == "metis":
-        divide_list = metis_divide(data.edge_index, data.x.size(0), args.num_subgraphs, False)
-    elif args.divide_method == "kmeans":
-        divide_list = kmeans_divide(data.x, args.num_subgraphs)
-    elif args.divide_method == "SC":
-        divide_list = SC_divide(data.x, args.num_subgraphs)
+    masks = [data.train_mask, data.val_mask, data.test_mask]
+    [print(torch.sum(mask)) for mask in masks]
 
-    print("Finish Partition")
+    if divide_method == "metis":
+        divide_list = metis_divide(data.edge_index, data.x.size(0), num_subgraphs, False)
+    elif divide_method == "kmeans":
+        divide_list = kmeans_divide(data.x, num_subgraphs)
+    elif divide_method == "SC":
+        divide_list = SC_divide(data.x, num_subgraphs)
 
-    if args.backbone == "GCN":
+    if backbone == "GCN":
         model = GCN(data.num_features, 512, data.num_classes, 2, 0.2).to(device)
-    elif args.backbone == "APPNP":
+    elif backbone == "APPNP":
         model = Net_APPNP(data.num_features, 512, data.num_classes, 2, 0.2).to(device)
-    elif args.backbone == "SAGE":
+    elif backbone == "SAGE":
         model = SAGE(data.num_features, 512, data.num_classes, 3, 0.2).to(device)
 
-    train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
+    train_loader = get_train_loader(divide_list, data, gppool, y_setting, int(num_subgraphs / 4))
     test_loader = NeighborLoader(data, num_neighbors=[-1], shuffle=False, batch_size=15000,
                                  num_workers=16, persistent_workers=True)
 
-    logger = Logger(args.runs)
-    for run in range(args.runs):
+    logger = Logger(runs)
+    for run in range(runs):
         print('============================================')
         model.reset_parameters()
 
-        weight_decay = args.weight_decay if args.weight_decay is not None else 0
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=weight_decay)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-        for epoch in range(1, 1 + args.epochs):
+        for epoch in range(1, 1 + epochs):
             loss = train(model, train_loader, optimizer, device)
             print(f'Run: {run + 1:02d}, Epoch: {epoch:02d}, Loss: {loss:.4f}')
-            train_loader = get_train_loader(divide_list, data, args.gppool, args.y_setting, args.batch_size)
+            train_loader = get_train_loader(divide_list, data, gppool, y_setting, int(num_subgraphs / 4))
 
-            if epoch > 9 and epoch % args.eval_steps == 0:
-                train_acc, val_acc, test_acc = test(model, data, args.backbone, test_loader, device)
+            if epoch > 19 and epoch % eval_steps == 0:
+                train_acc, val_acc, test_acc = test(model, data, backbone, test_loader, device)
                 print(f'Train: {train_acc:.4f}, Val: {val_acc:.4f}, Test: {test_acc:.4f}')
                 result = train_acc, val_acc, test_acc
                 logger.add_result(run, result)
 
         logger.print_statistics(run)
     logger.print_statistics()
-
-    masks = [data.train_mask, data.val_mask, data.test_mask]
-    [print(torch.sum(mask)) for mask in masks]
-
