@@ -14,7 +14,7 @@ def main():
     parser.add_argument('--gppool', type=bool, default=True)
     parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--weight_decay', type=float, default=0.00005)
-    parser.add_argument('--epochs', type=int, default=200)
+    parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--eval_steps', type=int, default=1)
     parser.add_argument('--runs', type=int, default=3)
     parser.add_argument('--cuda', type=int, default=1)
