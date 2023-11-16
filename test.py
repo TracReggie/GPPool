@@ -7,7 +7,7 @@ def main():
     parser.add_argument('--dataset', type=str, default="cora")
     parser.add_argument('--backbone', type=str, default="GCN")  # GCN, APPNP, SAGE
     parser.add_argument('--divide_method', type=str, default="metis") # metis, kmeans, SC
-    parser.add_argument('--num_subgraphs', type=int, default=20)
+    parser.add_argument('--num_subgraphs', type=int, default=70)
     parser.add_argument('--batch_size', type=int, default=5)
     parser.add_argument('--y_setting', type=str, default="argmax")  # argmax, same, softmax
 
@@ -21,7 +21,9 @@ def main():
     args = parser.parse_args()
     print(args)
 
-    run_experiments(args)
+    run_experiments(
+        args.dataset, args.backbone, args.divide_method, args.num_subgraphs, args.y_setting,
+        args.gppool, args.lr, args.weight_decay, args.epochs, args.eval_steps, args.runs, args.cuda)
 
     print('============================================')
     print(args)
