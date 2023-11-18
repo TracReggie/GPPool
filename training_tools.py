@@ -20,10 +20,10 @@ class Logger(object):
             max_val = result[:, 1].max()
             mask = (result[:, 1] == max_val)
             print(f'Run {run + 1:02d}:')
-            print(f'Highest Train: {result[:, 0].max():.2f}')
-            print(f'Highest Test: {result[:, 2].max():.2f}')
             print(f'Highest Valid: {max_val:.2f}')
+            print(f'Highest Train: {result[:, 0].max():.2f}')
             print(f'Final Train: {torch.max(result[:, 0][mask]):.2f}')
+            print(f'Highest Test: {result[:, 2].max():.2f}')
             print(f'Final Test: {torch.max(result[:, 2][mask]):.2f}')
         else:
             results = 100 * torch.tensor(self.results)
