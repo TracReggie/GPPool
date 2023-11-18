@@ -91,12 +91,13 @@ def get_subgraph(data, nodes_index, relabel_nodes):
     sub_test_mask = data.test_mask[nodes_index]
     sub_edge_index, _ = subgraph(nodes_index, data.edge_index, None, relabel_nodes, data.x.size(0))
 
-    induced_subgraph = Data(x=sub_x, y=sub_y, edge_index=sub_edge_index, train_mask=sub_train_mask, val_mask=sub_val_mask, test_mask=sub_test_mask)
+    induced_subgraph = Data(x=sub_x, y=sub_y, edge_index=sub_edge_index,
+                            train_mask=sub_train_mask, val_mask=sub_val_mask, test_mask=sub_test_mask)
 
     return induced_subgraph
 
 
-def GPPool(data, divide_list, unpooled_parts, y_setting):
+def GPPool(data, num_classes, divide_list, unpooled_parts, y_setting):
     pooled_parts, unpooled_nodes = [], []
     for i, part in enumerate(divide_list):
         if i in unpooled_parts:
@@ -110,7 +111,7 @@ def GPPool(data, divide_list, unpooled_parts, y_setting):
     retain_x = data.x[unpooled_nodes]
     x2 = [retain_x]
 
-    data_y = one_hot(data.y, data.num_classes)
+    data_y = one_hot(data.y, num_classes)
     retain_y = torch.softmax(data_y[unpooled_nodes], dim=1) if y_setting == "softmax" else data_y[unpooled_nodes]
     y2 = [retain_y]
 
@@ -127,22 +128,22 @@ def GPPool(data, divide_list, unpooled_parts, y_setting):
         mask = (data.train_mask | data.val_mask)[part]
         if mask.sum() > 0:
             part_y = data_y[part]
-            part_y[~mask] = torch.Tensor([0 for _ in range(data.num_classes)])
+            part_y[~mask] = torch.Tensor([0 for _ in range(num_classes)])
 
             if y_setting == "argmax":
                 part_mask = torch.tensor(1, dtype=torch.bool).view(1)
                 label = torch.argmax(torch.sum(part_y, dim=0))
-                part_y = one_hot(label.view(1), data.num_classes)
+                part_y = one_hot(label.view(1), num_classes)
             elif y_setting == "same":
                 part_mask = (torch.sum(torch.sum(part_y, dim=0).bool()) == 1).view(1)
                 label = torch.argmax(torch.sum(part_y, dim=0))
-                part_y = one_hot(label.view(1), data.num_classes)
+                part_y = one_hot(label.view(1), num_classes)
             elif y_setting == "softmax":
                 part_mask = torch.tensor(1, dtype=torch.bool).view(1)
                 label = torch.sum(part_y, dim=0).view(1, -1)
                 part_y = torch.softmax(label, dim=-1)
         else:
-            part_y = torch.tensor([[0 for _ in range(data.num_classes)]])
+            part_y = torch.tensor([[0 for _ in range(num_classes)]])
             part_mask = torch.tensor(0, dtype=torch.bool).view(1)
 
         y2.append(part_y)
@@ -159,3 +160,4 @@ def GPPool(data, divide_list, unpooled_parts, y_setting):
     pooled_g = Data(x=x2, y=y2, edge_index=edge_index2, train_mask=train_mask2)
 
     return pooled_g
+
