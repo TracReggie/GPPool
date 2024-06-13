@@ -16,11 +16,11 @@ If you need to apply GPPool to other datasets, modify the dataset section in tes
 Please cite our work if you find it is useful for you:
 ```
 @article{TrainingLargeScaleGraph,
-  title = {Training {{Large-Scale Graph Neural Networks Via Graph Partial Pooling}}},
+  title = {Training Large-Scale Graph Neural Networks Via Graph Partial Pooling},
   author = {Zhang, Qi and Sun, Yanfeng and Wang, Shaofan and Gao, Junbin and Hu, Yongli and Yin, Baocai},
   year = {2024},
   journal = {IEEE Transactions on Big Data},
-  note = {Early Access, DOI: 10.1109/TBDATA.2024.3403380}
+  annotation = {Early Access, DOI: 10.1109/TBDATA.2024.3403380}
 }
 
 ```
